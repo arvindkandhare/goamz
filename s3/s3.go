@@ -30,7 +30,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/AdRoll/goamz/aws"
+	"github.com/arvindkandhare/goamz/aws"
 )
 
 const debug = false
@@ -1018,7 +1018,9 @@ func (s3 *S3) setBaseURL(req *request) error {
 // require the first character after the bucket name in the path to be a literal '?' and
 // not the escaped hex representation '%3F'.
 func partiallyEscapedPath(path string) string {
+	
 	pathEscapedAndSplit := strings.Split((&url.URL{Path: path}).String(), "/")
+	
 	if len(pathEscapedAndSplit) >= 3 {
 		if len(pathEscapedAndSplit[2]) >= 3 {
 			// Check for the one "?" that should not be escaped.
@@ -1077,7 +1079,7 @@ func (s3 *S3) prepare(req *request) error {
 		signpathPatiallyEscaped := partiallyEscapedPath(req.path)
 		req.headers["Host"] = []string{u.Host}
 		req.headers["Date"] = []string{time.Now().In(time.UTC).Format(time.RFC1123)}
-
+		
 		sign(s3.Auth, req.method, signpathPatiallyEscaped, req.params, req.headers)
 	} else {
 		hreq, err := s3.setupHttpRequest(req)
