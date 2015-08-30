@@ -8,10 +8,13 @@ import (
 	"encoding/xml"
 	"errors"
 	"io"
+	
 	"net/url"
 	"sort"
 	"strconv"
 	"strings"
+	
+	"github.com/Sirupsen/logrus"
 )
 
 // Multi represents an unfinished multipart upload.
@@ -187,6 +190,7 @@ func (m *Multi) PutPartCopy(n int, options CopyOptions, source string) (*CopyObj
 func (m *Multi) PutPart(n int, r io.ReadSeeker) (Part, error) {
 	partSize, _, md5b64, err := seekerInfo(r)
 	if err != nil {
+		logrus.Errorf("SeekerInfo failed\n");
 		return Part{}, err
 	}
 	return m.putPart(n, r, partSize, md5b64)
@@ -214,21 +218,26 @@ func (m *Multi) putPart(n int, r io.ReadSeeker, partSize int64, md5b64 string) (
 			params:  params,
 			payload: r,
 		}
+		logrus.Infof("Preparing the req\n");
 		err = m.Bucket.S3.prepare(req)
 		if err != nil {
+			logrus.Errorf("Failed 1\n");
 			return Part{}, err
 		}
 		resp, err := m.Bucket.S3.run(req, nil)
 		if shouldRetry(err) && attempt.HasNext() {
+			logrus.Errorf("Failed 2\n");
 			continue
 		}
 		if err != nil {
+			logrus.Errorf("Failed 3\n");
 			return Part{}, err
 		}
 		etag := resp.Header.Get("ETag")
 		if etag == "" {
 			return Part{}, errors.New("part upload succeeded with no ETag")
 		}
+		logrus.Errorf("One part succeeded\n");
 		return Part{n, etag, partSize}, nil
 	}
 	panic("unreachable")
