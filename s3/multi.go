@@ -8,6 +8,7 @@ import (
 	"encoding/xml"
 	"errors"
 	"io"
+	"fmt"
 	"net/url"
 	"sort"
 	"strconv"
@@ -187,6 +188,7 @@ func (m *Multi) PutPartCopy(n int, options CopyOptions, source string) (*CopyObj
 func (m *Multi) PutPart(n int, r io.ReadSeeker) (Part, error) {
 	partSize, _, md5b64, err := seekerInfo(r)
 	if err != nil {
+		fmt.Printf("SeekerInfo failed\n");
 		return Part{}, err
 	}
 	return m.putPart(n, r, partSize, md5b64)

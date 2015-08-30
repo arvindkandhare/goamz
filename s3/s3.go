@@ -33,7 +33,7 @@ import (
 	"github.com/arvindkandhare/goamz/aws"
 )
 
-const debug = true
+const debug = false
 
 // The S3 type encapsulates operations with an S3 region.
 type S3 struct {
