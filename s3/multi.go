@@ -216,21 +216,26 @@ func (m *Multi) putPart(n int, r io.ReadSeeker, partSize int64, md5b64 string) (
 			params:  params,
 			payload: r,
 		}
+		fmt.Printf("Preparing the req\n");
 		err = m.Bucket.S3.prepare(req)
 		if err != nil {
+			fmt.Printf("Failed 1\n");
 			return Part{}, err
 		}
 		resp, err := m.Bucket.S3.run(req, nil)
 		if shouldRetry(err) && attempt.HasNext() {
+			fmt.Printf("Failed 2\n");
 			continue
 		}
 		if err != nil {
+			fmt.Printf("Failed 3\n");
 			return Part{}, err
 		}
 		etag := resp.Header.Get("ETag")
 		if etag == "" {
 			return Part{}, errors.New("part upload succeeded with no ETag")
 		}
+		fmt.Printf("One part succeeded\n");
 		return Part{n, etag, partSize}, nil
 	}
 	panic("unreachable")
