@@ -3,7 +3,7 @@ package sns
 import (
 	"encoding/xml"
 	"fmt"
-	"github.com/AdRoll/goamz/aws"
+	"github.com/arvindkandhare/goamz/aws"
 	"net/http"
 )
 
